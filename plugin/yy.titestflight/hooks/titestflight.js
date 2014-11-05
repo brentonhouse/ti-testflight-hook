@@ -47,11 +47,18 @@ function configure(data,finished) {
     logger.error("testflight.team_token is missing.");
     return;
   } 
-  var tmpFile = mktemp.createFileSync('XXXXXXXXXXX');
-  editor(tmpFile, function(code,sig) {
-    config.notes = fs.readFileSync(tmpFile).toString();
-    doPrompt(data, finished);
-  });
+    if (config.notes === undefined) {
+      var tmpFile = mktemp.createFileSync('XXXXXXXXXXX');
+      editor(tmpFile, function(code,sig) {
+        config.notes = fs.readFileSync(tmpFile).toString();
+        doPrompt(data, finished);
+      });        
+  } else {
+  
+    finished();
+  } 
+  
+
 }
 
 function doPrompt(data, callback) {
