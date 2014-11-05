@@ -110,6 +110,16 @@ function doPrompt(data, callback) {
   });
 }
 function doTestFlight(data, finished) {
+    
+    if(_.isUndefined(form)){
+        form = new Form();
+          _.keys(config).forEach(function(k) {
+      if(k !== 'dsym') {
+        form.append(k, config[k]);
+      }
+    });
+    }
+    
       var build_file =afs.resolvePath(path.join(data.buildManifest.outputDir, data.buildManifest.name + "." + (data.cli.argv.platform === "android" ? "apk" : "ipa")));
     form.append('file', fs.createReadStream(build_file));
 
