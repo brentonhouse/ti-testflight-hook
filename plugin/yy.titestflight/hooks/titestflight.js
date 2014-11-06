@@ -57,7 +57,7 @@ function configure(data, finished) {
         }
     } else {
         
-        var release_notes_path = afs.resolvePath(path.join('.', config.release_notes_file);
+        var release_notes_path = afs.resolvePath(path.join('.', config.release_notes_file));
         if (fs.existsSync(release_notes_path)) {
             tf.notes = fs.readFileSync(release_notes_path);
             fs.unlink(release_notes_path);
