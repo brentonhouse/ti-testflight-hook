@@ -81,7 +81,7 @@ function doTestFlight(data, finished) {
     f.distribution_lists = fields.text({
       title: "Distribution Lists",
       desc: "Enter a comma separated list (or leave empty)"
-    })
+    });
   }
   if ('ios' === data.cli.argv.platform && tf.dsym === undefined) {
     f.dsym= fields.select({
