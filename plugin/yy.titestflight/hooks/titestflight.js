@@ -15,7 +15,7 @@ exports.init = function (_logger, config, cli, appc) {
         cli.addHook('build.pre.compile', configure);
         cli.addHook('build.finalize', doTestFlight);
     }
-	alloyConfig = config;
+    alloyConfig = config;
     logger = _logger;
 }
 
@@ -59,11 +59,11 @@ function configure(data, finished) {
         
         var release_notes_path = afs.resolvePath(path.join('.', config.release_notes_file));
         if (fs.existsSync(release_notes_path)) {
-            tf.notes = fs.readFileSync(release_notes_path);
+            config.notes = fs.readFileSync(release_notes_path);
             fs.unlink(release_notes_path);
         } else if (tf.release_notes) {
             logger.warn('Release note file not found (' + release_notes_path + ')');
-            tf.notes = tf.release_notes;
+            config.notes = config.release_notes;
         } else {
             logger.error("testflight.release_notes is missing.");
             logger.error('Release note file not found (' + release_notes_path + ')');
@@ -73,7 +73,9 @@ function configure(data, finished) {
 
     }
     
-     finished();
+    config.delete('release_notes_file');
+    config.delete('release_notes');
+    finished();
     
     //if (config.notes === undefined) {
     //    var tmpFile = mktemp.createFileSync('XXXXXXXXXXX');
@@ -93,15 +95,15 @@ function configure(data, finished) {
 //    config = _.pick(config, 'api_token', 'team_token', 'notify', 'distribution_lists', 'dsym', 'release_notes', 'release_notes_file');
 //    var f = {};
 //    var release_notes_path = afs.resolvePath(path.join(data.buildManifest.outputDir), '' + tf.release_notes_file);
-    
+
 //    if (fs.existsSync(release_notes_path)) {
 //        tf.notes = fs.readFileSync(release_notes_path);
 //        fs.unlink(release_notes_path);
 //    } else {
 //        logger.error('Release note file not found (' + release_notes_path + ')');
 //    }
-    
-    
+
+
 //    if (_.isEmpty(tf.notes)) {
 //        f.notes = fields.text({
 //            title: "Release Notes",
@@ -111,7 +113,7 @@ function configure(data, finished) {
 //            }
 //        });
 //    }
-    
+
 //    if (config.notify === undefined) {
 //        f.notify = fields.select({
 //            title: "Notify",
@@ -120,7 +122,7 @@ function configure(data, finished) {
 //            options: ['__y__es', '__n__o'],
 //        });
 //    }
-    
+
 //    if (config.distribution_lists === undefined) {
 //        f.distribution_lists = fields.text({
 //            title: "Distribution Lists",
@@ -143,7 +145,7 @@ function configure(data, finished) {
 //        } else {
 //            logger.info("Release notes file found");
 //        }
-        
+
 //        if (result.distribution_lists && result.distribution_lists != "") {
 //            config.distribution_lists = result.distribution_lists
 //        }
