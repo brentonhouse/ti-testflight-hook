@@ -9,12 +9,13 @@ var _ = require("underscore"),
     fields = require("fields");
 
 exports.cliVersion = '>=3.2';
-var logger, form, platform, config;
+var logger, form, platform, config, alloyConfig;
 exports.init = function (_logger, config, cli, appc) {
     if (process.argv.indexOf('--test-flight') !== -1 || process.argv.indexOf('--testflight') !== -1) {
         cli.addHook('build.pre.compile', configure);
         cli.addHook('build.finalize', doTestFlight);
     }
+	alloyConfig = config;
     logger = _logger;
 }
 
@@ -56,7 +57,7 @@ function configure(data, finished) {
         }
     } else {
         
-        var release_notes_path = afs.resolvePath(path.join(config.dir.project), config.release_notes_file);
+        var release_notes_path = afs.resolvePath(path.join(alloyConfig.dir.project), config.release_notes_file);
         if (fs.existsSync(release_notes_path)) {
             tf.notes = fs.readFileSync(release_notes_path);
             fs.unlink(release_notes_path);
