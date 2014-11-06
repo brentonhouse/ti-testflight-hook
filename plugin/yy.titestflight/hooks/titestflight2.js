@@ -62,9 +62,28 @@ function configure(data,finished) {
 }
 
 function doPrompt(data, callback) {
-  config = _.pick(config, 'api_token','team_token', 'notify', 'distribution_lists', 'dsym', 'notes');
-  var f = {
-  };
+  config = _.pick(config, 'api_token','team_token', 'notify', 'distribution_lists', 'dsym', 'release_notes', 'release_notes_file');
+var f = {};
+  var release_notes_path = afs.resolvePath(path.join(data.buildManifest.outputDir), ''+tf.release_notes_file);
+
+  if (fs.existsSync(release_notes_path)) {
+    tf.notes = fs.readFileSync(release_notes_path);
+    fs.unlink(release_notes_path);
+  } else {
+    logger.error('Release note file not found (' + release_notes_path + ')');
+  }
+  
+  
+  if (_.isEmpty(tf.notes)) {
+    f.notes = fields.text({
+      title: "Release Notes",
+      desc: "Enter release notes (required)",
+      validate: function(value,callback) {
+        callback(!value.length, value);
+      }
+    });
+  }
+  
   if (config.notify === undefined) {
     f.notify= fields.select({
       title: "Notify",
@@ -73,6 +92,7 @@ function doPrompt(data, callback) {
       options: ['__y__es','__n__o'],
     });
   } 
+  
   if (config.distribution_lists === undefined) {
     f.distribution_lists = fields.text({
       title: "Distribution Lists",
@@ -90,6 +110,12 @@ function doPrompt(data, callback) {
   var prompt = fields.set(f);
   prompt.prompt(function(err, result) {
     form = new Form();
+      if (_.isEmpty(tf.notes)) {
+      tf.notes = result.notes;
+    } else {
+      logger.info("Release notes file found");
+    }
+    
     if (result.distribution_lists && result.distribution_lists != "") {
       config.distribution_lists = result.distribution_lists
     }
