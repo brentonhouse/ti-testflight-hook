@@ -73,8 +73,8 @@ function configure(data, finished) {
 
     }
     
-    config.delete('release_notes_file');
-    config.delete('release_notes');
+    delete config.release_notes_file;
+    delete config.release_notes;
     finished();
     
     //if (config.notes === undefined) {
