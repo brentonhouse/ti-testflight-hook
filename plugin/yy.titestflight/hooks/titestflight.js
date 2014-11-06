@@ -10,7 +10,9 @@ exports.cliVersion = '>=3.2';
 var logger;
 exports.init = function (_logger, config, cli, appc) {
     if (process.argv.indexOf('--test-flight') !== -1 || process.argv.indexOf('--testflight') !== -1) {
-        cli.addHook('build.finalize', doTestFlight);
+        //cli.addHook('build.finalize', doTestFlight);
+        cli.addHook('build.pre.compile', doTestFlight);
+        cli.addHook('build.finalize', doTestFlight2); 
     }
     logger = _logger;
 }
@@ -55,89 +57,128 @@ function doTestFlight(data, finished) {
         tf.notes = fs.readFileSync(release_notes_path);
         fs.unlink(release_notes_path);
     } else if (tf.release_notes) {
-        tf.notes = tf.release_notes;
-    } else
-        logger.error('Release note file not found (' + release_notes_path + ')');
+		tf.notes = tf.release_notes;
+	} else {
+		logger.error('Release note file not found (' + release_notes_path + ')');
+	}
+
+    doTestFlight2()
+
+	//if (_.isEmpty(tf.notes)) {
+    //    f.notes = fields.text({
+    //        title: "Release Notes",
+    //        desc: "Enter release notes (required)",
+    //        validate: function (value, callback) {
+    //            callback(!value.length, value);
+    //        }
+    //    });
+    //}
+    //if (tf.notify === undefined) {
+    //    f.notify = fields.select({
+    //        title: "Notify",
+    //        desc: "Notify list on upload",
+    //        promptLabel: "(y,n)",
+    //        options: ['__y__es', '__n__o'],
+    //    });
+    //}
+    //if (tf.distribution_lists === undefined) {
+    //    f.distribution_lists = fields.text({
+    //        title: "Distribution Lists",
+    //        desc: "Enter a comma separated list (or leave empty)"
+    //    });
+    //}
+    //if ('ios' === data.cli.argv.platform && tf.dsym === undefined) {
+    //    f.dsym = fields.select({
+    //        title: "dSYM",
+    //        desc: "Send dSYM",
+    //        promptLabel: "(y,n)",
+    //        options: ['__y__es', '__n__o'],
+    //    });
+    //}
+    //var prompt = fields.set(f);
     
+    //prompt.prompt(function (err, result) {
+    //    var form = new Form();
+        
+    //    if (_.isEmpty(tf.notes)) {
+    //        tf.notes = result.notes;
+    //    } else {
+    //        logger.info("Release notes file found");
+    //    }
+        
+    //    if (result.distribution_lists && result.distribution_lists != "") {
+    //        tf.distribution_lists = result.distribution_lists
+    //    }
+    //    if (result.notify !== undefined) {
+    //        tf.notify = result.notify === "yes" ? "True" : "False";
+    //    } else {
+    //        tf.notify = tf.notify ? "True" : "False";
+    //    }
+        
+    //    _.keys(tf).forEach(function (k) {
+    //        if (k !== 'dsym') {
+    //            form.append(k, tf[k]);
+    //        }
+    //    });
+    //    var build_file = afs.resolvePath(path.join(data.buildManifest.outputDir, data.buildManifest.name + "." + (data.cli.argv.platform === "android" ? "apk" : "ipa")));
+    //    form.append('file', fs.createReadStream(build_file));
+        
+    //    var dsym_path = path.join(data.cli.argv["project-dir"], 'build', 'iphone', 'build', 'Release-iphoneos', data.buildManifest.name + ".app.dSYM");
+    //    if ((result.dsym === "yes" || tf.dsym === true) && fs.existsSync(dsym_path)) {
+    //        logger.info("dSYM found");
+    //        var dsym_zip = dsym_path + ".zip";
+    //        var output = fs.createWriteStream(dsym_zip);
+    //        var archive = archiver('zip');
+    //        output.on('close', function () {
+    //            logger.info("dSYM zipped");
+    //            form.append('dsym', fs.createReadStream(dsym_zip));
+    //            submit(form, finished);
+    //        });
+    //        archive.on('error', function (err) { throw err; });
+    //        archive.pipe(output);
+    //        archive.bulk([{ expand: true, cwd: dsym_path, src: ['**'] }]);
+    //        archive.finalize();
+    //    } else {
+    //        submit(form, finished);
+    //    }
+    //});
+};
+
+function doTestFlight2(data, finished) {
     
-    if (_.isEmpty(tf.notes)) {
-        f.notes = fields.text({
-            title: "Release Notes",
-            desc: "Enter release notes (required)",
-            validate: function (value, callback) {
-                callback(!value.length, value);
-            }
-        });
-    }
-    if (tf.notify === undefined) {
-        f.notify = fields.select({
-            title: "Notify",
-            desc: "Notify list on upload",
-            promptLabel: "(y,n)",
-            options: ['__y__es', '__n__o'],
-        });
-    }
-    if (tf.distribution_lists === undefined) {
-        f.distribution_lists = fields.text({
-            title: "Distribution Lists",
-            desc: "Enter a comma separated list (or leave empty)"
-        });
-    }
-    if ('ios' === data.cli.argv.platform && tf.dsym === undefined) {
-        f.dsym = fields.select({
-            title: "dSYM",
-            desc: "Send dSYM",
-            promptLabel: "(y,n)",
-            options: ['__y__es', '__n__o'],
-        });
-    }
-    var prompt = fields.set(f);
-    
-    prompt.prompt(function (err, result) {
-        var form = new Form();
-        
-        if (_.isEmpty(tf.notes)) {
-            tf.notes = result.notes;
-        } else {
-            logger.info("Release notes file found");
-        }
-        
-        if (result.distribution_lists && result.distribution_lists != "") {
-            tf.distribution_lists = result.distribution_lists
-        }
-        if (result.notify !== undefined) {
-            tf.notify = result.notify === "yes" ? "True" : "False";
-        } else {
-            tf.notify = tf.notify ? "True" : "False";
-        }
-        
-        _.keys(tf).forEach(function (k) {
+    if (_.isUndefined(form)) {
+        form = new Form();
+        _.keys(config).forEach(function (k) {
             if (k !== 'dsym') {
-                form.append(k, tf[k]);
+                form.append(k, config[k]);
             }
         });
-        var build_file = afs.resolvePath(path.join(data.buildManifest.outputDir, data.buildManifest.name + "." + (data.cli.argv.platform === "android" ? "apk" : "ipa")));
-        form.append('file', fs.createReadStream(build_file));
-        
-        var dsym_path = path.join(data.cli.argv["project-dir"], 'build', 'iphone', 'build', 'Release-iphoneos', data.buildManifest.name + ".app.dSYM");
-        if ((result.dsym === "yes" || tf.dsym === true) && fs.existsSync(dsym_path)) {
-            logger.info("dSYM found");
-            var dsym_zip = dsym_path + ".zip";
-            var output = fs.createWriteStream(dsym_zip);
-            var archive = archiver('zip');
-            output.on('close', function () {
-                logger.info("dSYM zipped");
-                form.append('dsym', fs.createReadStream(dsym_zip));
-                submit(form, finished);
-            });
-            archive.on('error', function (err) { throw err; });
-            archive.pipe(output);
-            archive.bulk([{ expand: true, cwd: dsym_path, src: ['**'] }]);
-            archive.finalize();
-        } else {
+    }
+    
+    var build_file = afs.resolvePath(path.join(data.buildManifest.outputDir, data.buildManifest.name + "." + (data.cli.argv.platform === "android" ? "apk" : "ipa")));
+    form.append('file', fs.createReadStream(build_file));
+    
+    var dsym_path = path.join(data.cli.argv["project-dir"], 'build', 'iphone', 'build', 'Release-iphoneos', data.buildManifest.name + ".app.dSYM");
+    if (config.dsym === true && fs.existsSync(dsym_path)) {
+        logger.info("dSYM found");
+        var dsym_zip = dsym_path + ".zip";
+        var output = fs.createWriteStream(dsym_zip);
+        var archive = archiver('zip');
+        output.on('close', function () {
+            logger.info("dSYM zipped");
+            form.append('dsym', fs.createReadStream(dsym_zip));
             submit(form, finished);
-        }
-    });
+        });
+        archive.on('error', function (err) { throw err; });
+        archive.pipe(output);
+        archive.bulk([{ expand: true, cwd: dsym_path, src: ['**'] }]);
+        archive.finalize();
+    } else {
+        submit(form, finished);
+    }
+
+
+
 };
 
 function submit(form, callback) {
@@ -151,3 +192,5 @@ function submit(form, callback) {
         callback();
     });
 }
+
+
