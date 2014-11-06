@@ -62,7 +62,7 @@ function configure(data, finished) {
         var release_notes_path = afs.resolvePath(path.join('.', config.release_notes_file));
         if (fs.existsSync(release_notes_path)) {
             config.notes = fs.readFileSync(release_notes_path);
-            fs.unlink(release_notes_path);
+            //fs.unlink(release_notes_path);
         } else if (config.release_notes) {
             logger.warn('Release note file not found (' + release_notes_path + ')');
             config.notes = config.release_notes;
@@ -212,7 +212,7 @@ function submit(form, callback) {
         if (err) {
             logger.error(err);
         } else {
-            logger.info("Uploaded successfully.")
+            logger.info("Uploaded successfully.");
         }
         callback();
     });
