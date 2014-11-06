@@ -45,14 +45,18 @@ function doTestFlight(data, finished) {
     return;
   } 
 
-  tf = _.pick(tf, 'api_token','team_token', 'notify', 'distribution_lists', 'dsym', 'release_notes_file');
+  tf = _.pick(tf, 'api_token','team_token', 'notify', 'distribution_lists', 'dsym', 'release_notes','release_notes_file');
   var f = {};
   var release_notes_path = afs.resolvePath(path.join(data.buildManifest.outputDir), ''+tf.release_notes_file);
 
-  if (fs.existsSync(release_notes_path)) {
+  
+
+  if (tf.release_notes_file && fs.existsSync(release_notes_path)) {
     tf.notes = fs.readFileSync(release_notes_path);
     fs.unlink(release_notes_path);
-  } else {
+  } else if( tf.release_notes){
+    tf.notes = tf.release_notes;
+  }else 
     logger.error('Release note file not found (' + release_notes_path + ')');
   }
 
