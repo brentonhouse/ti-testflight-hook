@@ -51,9 +51,11 @@ function configure(data, finished) {
     
     if (config.release_notes_file === undefined) {
         if (config.release_notes === undefined) {
-            
-            logger.error("testflight.release_notes is missing.");
-            return;
+
+	        logger.error("testflight.release_notes is missing.");
+	        return;
+        } else {
+            config.notes = config.release_notes;
         }
     } else {
         
@@ -61,7 +63,7 @@ function configure(data, finished) {
         if (fs.existsSync(release_notes_path)) {
             config.notes = fs.readFileSync(release_notes_path);
             fs.unlink(release_notes_path);
-        } else if (tf.release_notes) {
+        } else if (config.release_notes) {
             logger.warn('Release note file not found (' + release_notes_path + ')');
             config.notes = config.release_notes;
         } else {
