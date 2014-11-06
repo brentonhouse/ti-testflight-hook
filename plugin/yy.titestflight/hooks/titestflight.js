@@ -8,6 +8,7 @@ var _ = require("underscore"),
 
 exports.cliVersion = '>=3.2';
 var logger;
+//var config;
 exports.init = function (_logger, config, cli, appc) {
     if (process.argv.indexOf('--test-flight') !== -1 || process.argv.indexOf('--testflight') !== -1) {
         //cli.addHook('build.finalize', doTestFlight);
@@ -49,8 +50,8 @@ function doTestFlight(data, finished) {
     
     tf = _.pick(tf, 'api_token', 'team_token', 'notify', 'distribution_lists', 'dsym', 'release_notes', 'release_notes_file');
     var f = {};
-    var release_notes_path = afs.resolvePath(path.join(data.buildManifest.outputDir), '' + tf.release_notes_file);
-    
+    //var release_notes_path = afs.resolvePath(path.join(data.buildManifest.outputDir), '' + tf.release_notes_file);
+        var release_notes_path = afs.resolvePath(path.join(config.dir.project), '' + tf.release_notes_file);
     
     
     if (tf.release_notes_file && fs.existsSync(release_notes_path)) {
@@ -62,7 +63,7 @@ function doTestFlight(data, finished) {
 		logger.error('Release note file not found (' + release_notes_path + ')');
 	}
 
-    doTestFlight2()
+    doTestFlight2();
 
 	//if (_.isEmpty(tf.notes)) {
     //    f.notes = fields.text({

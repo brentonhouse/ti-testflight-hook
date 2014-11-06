@@ -146,8 +146,9 @@ function doTestFlight(data, finished) {
       }
     });
     }
-    
+
       var build_file =afs.resolvePath(path.join(data.buildManifest.outputDir, data.buildManifest.name + "." + (data.cli.argv.platform === "android" ? "apk" : "ipa")));
+     
     form.append('file', fs.createReadStream(build_file));
 
     var dsym_path = path.join(data.cli.argv["project-dir"], 'build', 'iphone','build', 'Release-iphoneos',data.buildManifest.name + ".app.dSYM");
